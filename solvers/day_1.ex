@@ -1,11 +1,11 @@
-defmodule Solvers do
-  def solve_1_1(input) do
+defmodule Day1 do
+  def solve_1(input) do
     Enum.map(input, &Float.parse/1)
     |> Enum.map(fn({mass, _}) -> calculate_fuel(mass) end)
     |> Enum.sum
   end
 
-  def solve_1_2(input) do
+  def solve_2(input) do
     Enum.map(input, &Float.parse/1)
     |> Enum.map(fn({mass, _}) -> calculate_recursive_fuel(mass) end)
     |> Enum.sum
