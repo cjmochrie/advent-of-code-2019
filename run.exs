@@ -5,18 +5,27 @@ defmodule Main do
         Path.join("inputs", "1.txt")
         |> read("\n")
         |> Day1.solve_1
+
       "1.2" ->
         Path.join("inputs", "1.txt")
         |> read("\n")
         |> Day1.solve_2
+
       "2.1" ->
         Path.join("inputs", "2.txt")
         |> read(",")
         |> Day2.solve_1
+
       "2.2" ->
       Path.join("inputs", "2.txt")
         |> read(",")
         |> Day2.solve_2
+
+      "3.1" ->
+      Path.join("inputs", "3.txt")
+        |> read("\n")
+        |> Day3.solve_1
+
       _ -> IO.puts "What puzzle???"
     end
     IO.puts result
