@@ -2,17 +2,21 @@ defmodule Day4 do
   def solve_1([first, second]) do
     start = parse_input(first)
     finish = parse_input(second) |> back_to_int
-    IO.inspect start
-    IO.inspect finish
-    count_valid(start, finish)
+    count_valid(start, finish, &adjacent?/1)
   end
 
-  def count_valid(password, maximum, valid \\ 0) do
+  def solve_2([first, second]) do
+    start = parse_input(first)
+    finish = parse_input(second) |> back_to_int
+    count_valid(start, finish, &has_twin?/2)
+  end
+
+  def count_valid(password, maximum, validator, valid \\ 0) do
     next_incrementing = valid_or_increase(password)
     cond do
       back_to_int(next_incrementing) > maximum -> valid
-      adjacent?(next_incrementing) -> count_valid(plus_one(next_incrementing), maximum, valid + 1)
-      true -> count_valid(plus_one(next_incrementing), maximum, valid)
+      validator.(next_incrementing, nil) -> count_valid(plus_one(next_incrementing), maximum, validator, valid + 1)
+      true -> count_valid(plus_one(next_incrementing), maximum, validator, valid)
     end
   end
 
@@ -27,7 +31,17 @@ defmodule Day4 do
     [first]
   end
 
+  def has_twin?([first, second, third | rest], last) do
+    cond do
+      last == nil and first == second and second != third -> true
+      last != first and first == second and second != third -> true
+      true -> has_twin?([second, third | rest ], first)
+    end
+  end
 
+  def has_twin?([first, second], last) do
+    last != first and first == second
+  end
 
   def adjacent?([first, second | rest]) do
     cond do
