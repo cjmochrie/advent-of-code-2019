@@ -1,13 +1,13 @@
 defmodule Day4 do
   def solve_1([first, second]) do
-    start = parse_input(first)
-    finish = parse_input(second) |> back_to_int
+    start = Utils.string_to_int_list(first)
+    finish = Utils.string_to_int_list(second) |> back_to_int
     count_valid(start, finish, &adjacent?/1)
   end
 
   def solve_2([first, second]) do
-    start = parse_input(first)
-    finish = parse_input(second) |> back_to_int
+    start = Utils.string_to_int_list(first)
+    finish = Utils.string_to_int_list(second) |> back_to_int
     count_valid(start, finish, &has_twin?/2)
   end
 
@@ -54,12 +54,6 @@ defmodule Day4 do
     false
   end
 
-  def parse_input(input) do
-    String.graphemes(input)
-    |> Enum.map(&Integer.parse/1)
-    |> Enum.map(fn(n) -> elem(n, 0) end)
-  end
-
   def back_to_int(int_list) do
     Enum.reverse(int_list)
     |> Enum.with_index
@@ -69,11 +63,7 @@ defmodule Day4 do
   end
 
   def plus_one(int_list) do
-    back_to_int(int_list) + 1 |> to_int_list
-  end
-
-  def to_int_list(num) do
-    to_string(num) |> parse_input
+    back_to_int(int_list) + 1 |> Utils.int_to_int_list
   end
 end
 
