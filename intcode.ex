@@ -48,20 +48,18 @@ defmodule Intcode do
     %{ :caller_id => caller_id } = computer
     receive do
       { :input, value, ^caller_id } ->
-        IO.puts "RECEIVING! #{value}"
-        { value, _ } = Integer.parse(value)
         %Computer{ computer |
           program: update(computer, address, value).program,
           position: computer.position + 2 }
-    after
-      100 -> IO.puts "NEVER RECEIVED"
+#    after
+#      100 -> IO.puts "NEVER RECEIVED"
     end
   end
 
   def process_opcode({ @output, [mode | _] }, computer) do
     address = get(%Computer{ computer | position: computer.position + 1 })
     output = param_value(mode, address, computer)
-    send(computer.caller_id, { :done, output })
+    send(computer.caller_id, { :done, self(), output })
     %Computer{ computer | position: computer.position + 2 }
   end
 
@@ -128,7 +126,6 @@ defmodule Intcode do
   def update(computer, position, value) do
     %Computer{ computer | program: List.replace_at(computer.program, position, value) }
   end
-
 
   def parse_code([_, b, c, d, e]) do
     { d * 10 + e, [c, b, 0] }

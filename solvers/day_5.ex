@@ -12,8 +12,9 @@ defmodule Day5 do
                                            }) end
     send(computer, { :input, input, parent })
     receive do
-      { :done, output } ->
+      { :done, computer_id, output } ->
         IO.puts "Output: #{output}"
+        IO.inspect computer_id
     after
       1_000 -> IO.puts "Never finished"
     end
