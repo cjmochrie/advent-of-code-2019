@@ -58,6 +58,10 @@ defmodule Main do
         |> read(",")
         |> Day7.solve_1
 
+      "7.2" -> Path.join("inputs", "7.txt")
+        |> read(",")
+        |> Day7.solve_2
+
       _ -> IO.puts "What puzzle???"
     end
     IO.puts result

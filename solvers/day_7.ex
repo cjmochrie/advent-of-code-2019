@@ -7,16 +7,49 @@ defmodule Day7 do
     IO.puts "phases: #{phases |> Enum.join(",")}"
   end
 
-  def find_max!(program) do
-    phase_combinations
+  def solve_2(raw_program) do
+    program = Enum.map(raw_program, &Integer.parse/1)
+            |> Enum.map(fn({token, _}) -> token end)
+    { output, phases } = find_max_with_feedback!(program)
+    IO.puts "output: #{output}"
+    IO.puts "phases: #{phases |> Enum.join(",")}"
+  end
+
+  def find_max_with_feedback!(program) do
+    phase_combinations(5..9)
     |> Enum.map(fn phases ->
-      { start_all!(program, phases), phases }
+      amplifiers = make_amplifiers(program, self())
+      { start_all_with_feedback!(amplifiers, phases), phases }
     end)
     |> Enum.max_by(fn({ output, phases }) -> output end)
   end
 
-  def start_all!(program, phases) do
-    amplifiers = make_amplifiers(program, self())
+   def start_all_with_feedback!(amplifiers, phases) do
+    Enum.zip(phases, amplifiers)
+      |> Enum.each fn({ phase, amplifier_id }) ->
+        send(amplifier_id, { :input, phase, self() })
+    end
+    start_with_feedback!(amplifiers)
+  end
+
+  def start_with_feedback!([first_id | rest], input \\ 0) do
+    send(first_id, { :input, input, self() })
+    case pass_outputs(rest) do
+      { :continue, output } -> start_with_feedback!([first_id | rest], output)
+      { :done, output } -> output
+    end
+  end
+
+  def find_max!(program) do
+    phase_combinations
+    |> Enum.map(fn phases ->
+      amplifiers = make_amplifiers(program, self())
+      { start_all!(amplifiers, phases), phases }
+    end)
+    |> Enum.max_by(fn({ output, phases }) -> output end)
+  end
+
+  def start_all!(amplifiers, phases) do
     Enum.zip(phases, amplifiers)
       |> Enum.each fn({ phase, amplifier_id }) ->
         send(amplifier_id, { :input, phase, self() })
@@ -29,17 +62,24 @@ defmodule Day7 do
     pass_outputs(rest)
   end
 
-  def pass_outputs([amplifier_id | rest]) do
+  def pass_outputs(amplifiers, halted \\ 0)
+  def pass_outputs([amplifier_id | rest], halted_count) do
     receive do
       { :done, id, output } ->
       send(amplifier_id, { :input, output, self() })
-      pass_outputs(rest)
+      pass_outputs(rest, halted_count)
     end
   end
-  def pass_outputs([]) do
+  def pass_outputs([], halted_count) do
     receive do
       { :done, id, output } ->
-      output
+        if halted_count == 4 do
+          { :done, output }
+        else
+          { :continue, output }
+        end
+      { :halt, id } ->
+        pass_outputs([], halted_count + 1)
     end
   end
 
@@ -68,7 +108,7 @@ defmodule Day7 do
     }
   end
 
-  def phase_combinations(n \\ 5) do
-    Utils.permutations(Enum.to_list(0..(n - 1)), n)
+  def phase_combinations(phases \\ (0..4), n \\ 5) do
+    Utils.permutations(Enum.to_list(phases), n)
   end
 end

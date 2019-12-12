@@ -21,7 +21,7 @@ defmodule Intcode do
                   |> Utils.int_to_int_list
                   |> parse_code
     case instruction do
-      { @terminate,_ } -> { :ok, computer }
+      { @terminate,_ } -> send(computer.caller_id, { :halt, self() })
       _ -> process_opcode(instruction, computer)
            |> execute
     end
