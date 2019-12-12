@@ -67,6 +67,11 @@ defmodule Main do
                         |> File.read
         Day8.solve_1(String.codepoints(body))
 
+      "8.2" ->
+        { :ok, body } = Path.join("inputs", "8.txt")
+                        |> File.read
+        Day8.solve_2(String.codepoints(body))
+
       _ -> IO.puts "What puzzle???"
     end
     IO.puts result
